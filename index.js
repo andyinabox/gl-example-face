@@ -24,6 +24,32 @@ faceCanvas.height = height;
 
 var vidTexture, faceTexture, shader;
 
+function drawPositions(canvas, p) {
+	var ctx = canvas.getContext('2d');
+	ctx.fillStyle = '#000000';
+
+	ctx.beginPath();
+
+	for(var i = 0; i <= 18; i++) {
+		if(i === 0) {
+			ctx.moveTo(p[i][0], p[i][1]);
+		} else {
+			ctx.lineTo(p[i][0], p[i][1]);
+		}
+	}
+
+	// left eyebrow is in wrong order to do
+	// automatically
+	ctx.lineTo(p[22][0], p[22][1]);
+	ctx.lineTo(p[21][0], p[21][1]);
+	ctx.lineTo(p[20][0], p[20][1]);
+	ctx.lineTo(p[19][0], p[19][1]);
+
+	ctx.closePath();
+	ctx.fill();
+}
+
+
 shell.on('gl-init', function() {
 	var gl = shell.gl;
 	shader = createShader(gl, vert, frag);
@@ -43,9 +69,15 @@ shell.on('tick', function() {
 			} 
 	}
 
-	if(tracker.getCurrentPosition()) {
-		faceCanvas.getContext('2d').clearRect(0, 0, width, height);
-		tracker.draw(faceCanvas);
+	var positions = tracker.getCurrentPosition()
+
+	if(positions) {
+		var ctx = faceCanvas.getContext('2d');
+		ctx.fillStyle = '#ffffff';
+		ctx.fillRect(0, 0, width, height);
+		// tracker.draw(faceCanvas);
+		
+		drawPositions(faceCanvas, positions);
 
 		if(faceTexture) {
 	  	faceTexture.setPixels(faceCanvas);
