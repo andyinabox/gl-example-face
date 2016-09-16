@@ -6,17 +6,29 @@ var glslify = require('glslify');
 var clmtrackr = require('clmtrackr');
 
 var videoGrabber = require('./videoGrabber');
+var model = require('./node_modules/clmtrackr/models/model_pca_20_svm.json');
+
+var width = 600;
+var height = 400;
 
 var vert = glslify('./shader.vert');
 var frag = glslify('./shader.frag');
 
-var video = videoGrabber(600, 400);
+var tracker = new clmtrackr.tracker({useWebGL : true});
+var video = videoGrabber(width, height);
 
-var texture, shader;
+// canvas to draw face outline
+var faceCanvas = document.createElement('canvas');
+faceCanvas.width = width;
+faceCanvas.height = height;
+
+var vidTexture, faceTexture, shader;
 
 shell.on('gl-init', function() {
 	var gl = shell.gl;
 	shader = createShader(gl, vert, frag);
+	tracker.init(model);
+	tracker.start(video);
 });
 
 shell.on('tick', function() {
@@ -24,12 +36,23 @@ shell.on('tick', function() {
 
 		// is there video ready?
 	if(video.readyState === video.HAVE_ENOUGH_DATA) {
-			if(texture) {
-		  	texture.setPixels(video);
+			if(vidTexture) {
+		  	vidTexture.setPixels(video);
 			} else {
-				texture = createTexture(gl, video);
+				vidTexture = createTexture(gl, video);
 			} 
-	}	
+	}
+
+	if(tracker.getCurrentPosition()) {
+		faceCanvas.getContext('2d').clearRect(0, 0, width, height);
+		tracker.draw(faceCanvas);
+
+		if(faceTexture) {
+	  	faceTexture.setPixels(faceCanvas);
+		} else {
+			faceTexture = createTexture(gl, faceCanvas);
+		} 
+	}
 })
 
 shell.on('gl-render', function(t) {
@@ -38,10 +61,12 @@ shell.on('gl-render', function(t) {
 	// bind shader
 	shader.bind();
 
-	if(texture) {
-	  shader.uniforms.texture = texture.bind()
+	if(vidTexture) {
+	  shader.uniforms.vidTexture = vidTexture.bind(0);
 	}
-
+	if(faceTexture) {
+	  shader.uniforms.faceTexture = faceTexture.bind(1);
+	}
 	// draw big triangle
 	gessoCanvas(gl);
 });

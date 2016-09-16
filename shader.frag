@@ -1,9 +1,10 @@
 precision highp float;
-uniform sampler2D texture;
+uniform sampler2D vidTexture;
+uniform sampler2D faceTexture;
 varying vec2 texCoord;
 void main() {
-	vec4 color = texture2D(texture, texCoord);
-	float avg = (color.r + color.g + color.b) / 3.0;
-	vec3 rgb = vec3(avg);
-  gl_FragColor = vec4(rgb, color.a);
+	vec4 vid = texture2D(vidTexture, texCoord);
+	vec4 face = texture2D(faceTexture, texCoord);
+	vec3 rgb = vid.rgb - face.rgb;
+  gl_FragColor = vec4(rgb, 1.0);
 }
