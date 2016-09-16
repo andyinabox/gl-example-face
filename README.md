@@ -4,7 +4,7 @@ A simple example using Audun Mathias Øygard's [clmtrackr](https://github.com/au
 
 http://andyinabox.github.io/gl-example-face
 
-![grab.png](Screengrab)
+![Screengrab](grab.png)
 
 Running the example:
 
