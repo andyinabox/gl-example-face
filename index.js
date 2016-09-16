@@ -22,7 +22,7 @@ var faceCanvas = document.createElement('canvas');
 faceCanvas.width = width;
 faceCanvas.height = height;
 
-var vidTexture, faceTexture, shader;
+var videoTexture, maskTexture, shader;
 
 function drawPositions(canvas, p) {
 	var ctx = canvas.getContext('2d');
@@ -30,6 +30,7 @@ function drawPositions(canvas, p) {
 
 	ctx.beginPath();
 
+	// create polygon with face points
 	for(var i = 0; i <= 18; i++) {
 		if(i === 0) {
 			ctx.moveTo(p[i][0], p[i][1]);
@@ -62,28 +63,31 @@ shell.on('tick', function() {
 
 		// is there video ready?
 	if(video.readyState === video.HAVE_ENOUGH_DATA) {
-			if(vidTexture) {
-		  	vidTexture.setPixels(video);
+			if(videoTexture) {
+		  	videoTexture.setPixels(video);
 			} else {
-				vidTexture = createTexture(gl, video);
+				videoTexture = createTexture(gl, video);
 			} 
 	}
 
 	var positions = tracker.getCurrentPosition()
+	var ctx = faceCanvas.getContext('2d');
 
 	if(positions) {
-		var ctx = faceCanvas.getContext('2d');
 		ctx.fillStyle = '#ffffff';
 		ctx.fillRect(0, 0, width, height);
+
 		// tracker.draw(faceCanvas);
-		
 		drawPositions(faceCanvas, positions);
 
-		if(faceTexture) {
-	  	faceTexture.setPixels(faceCanvas);
+		if(maskTexture) {
+	  	maskTexture.setPixels(faceCanvas);
 		} else {
-			faceTexture = createTexture(gl, faceCanvas);
+			maskTexture = createTexture(gl, faceCanvas);
 		} 
+	} else {
+		ctx.fillStyle = '#ffffff';
+		ctx.fillRect(0, 0, width, height);		
 	}
 })
 
@@ -93,11 +97,12 @@ shell.on('gl-render', function(t) {
 	// bind shader
 	shader.bind();
 
-	if(vidTexture) {
-	  shader.uniforms.vidTexture = vidTexture.bind(0);
+	// bind textures
+	if(videoTexture) {
+	  shader.uniforms.video = videoTexture.bind(0);
 	}
-	if(faceTexture) {
-	  shader.uniforms.faceTexture = faceTexture.bind(1);
+	if(maskTexture) {
+	  shader.uniforms.mask = maskTexture.bind(1);
 	}
 	// draw big triangle
 	gessoCanvas(gl);

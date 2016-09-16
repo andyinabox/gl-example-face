@@ -1,17 +1,14 @@
-# example-face
+# StackGL Face Example
 
-[![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
+A simple example using Audun Mathias Øygard's [clmtrackr](https://github.com/auduno/clmtrackr) with [stack.gl](http://stack.gl/).
 
+http://andyinabox.github.io/gl-example-face
 
+![grab.png](Screengrab)
 
-## Usage
+Running the example:
 
-[![NPM](https://nodei.co/npm/example-face.png)](https://www.npmjs.com/package/example-face)
-
-## Contributing
-
-See [stackgl/contributing](https://github.com/stackgl/contributing) for details.
-
-## License
-
-MIT. See [LICENSE.md](http://github.com/andyinabox/example-face/blob/master/LICENSE.md) for details.
+```
+npm install
+npm start
+```

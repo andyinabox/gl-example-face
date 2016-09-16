@@ -1,12 +1,17 @@
 precision highp float;
-uniform sampler2D vidTexture;
-uniform sampler2D faceTexture;
+uniform sampler2D video;
+uniform sampler2D mask;
 varying vec2 texCoord;
+
 void main() {
-	vec4 vid = texture2D(vidTexture, texCoord);
-	vec4 face = texture2D(faceTexture, texCoord);
-	vec3 rgb = vid.rgb;
-	vec3 inverse = vec3(1.0) - rgb;
-	rgb = mix(rgb, inverse, face.r);
+	vec4 color = texture2D(video, texCoord);
+	vec4 face = texture2D(mask, texCoord);
+
+	// inverted color
+	vec3 inverse = vec3(1.0) - color.rgb;
+
+	// mix based on mask
+	vec3 rgb = mix(color.rgb, inverse, face.r);
+
   gl_FragColor = vec4(rgb, 1.0);
 }
